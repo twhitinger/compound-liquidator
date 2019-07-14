@@ -21,37 +21,29 @@ function AccountsTable(props) {
 
   const data = [];
 
+  console.log(props.accounts);
+
   props.accounts.forEach(account => {
-    var supplyAmount = (account.totalEthSupply / 1e18).toFixed(6);
-    var borrowAmount = (account.totalEthBorrow / 1e18).toFixed(6);
+    console.log(account.totalEthSupply);
+    var supplyAmount = (account.totalEthSupply / 1).toFixed(6);
+    var borrowAmount = (account.totalEthBorrow / 1).toFixed(6);
 
-    var ratio = +(supplyAmount / borrowAmount).toFixed(6);
-
-    var minCollateralRatio = app.state.MIN_COLLATERAL_RATIO;
-    var safeCollateralRatio = app.state.SAFE_COLLATERAL_RATIO;
-
-    // calculate the account liquidity
-
-    var accountLiquidity = (supplyAmount - (app.state.MIN_COLLATERAL_RATIO * borrowAmount)).toFixed(6);
 
     var state = "";
-
-    if (ratio < minCollateralRatio) {
+    var health = account.health;
+    if (health < 1) {
       state = "unsafe";
-    } else if (ratio <= safeCollateralRatio) {
+    } else if (health <= 1.05) {
       state = "risky";
     } else {
       state = "safe";
     }
 
-    var ratioDisplay = (ratio * 100).toFixed(6) + "%";
-
     var accountObj = {
       address: account.address,
       supply: Number(supplyAmount),
       borrow: Number(borrowAmount),
-      accountLiquidity: Number(accountLiquidity),
-      ratio: ratioDisplay,
+      health: account.health,
       state: state,
       block: Number(account.blockUpdated)
     };
@@ -95,14 +87,8 @@ function AccountsTable(props) {
       className: "right"
     },
     {
-      Header: "Ratio",
-      accessor: "ratio",
-      maxWidth: 150,
-      className: "right"
-    },
-    {
-      Header: "Account Liquidity",
-      accessor: "accountLiquidity",
+      Header: "Health",
+      accessor: "health",
       maxWidth: 150,
       className: "right"
     },

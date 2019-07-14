@@ -18,7 +18,7 @@ import "./App.css";
 
 let web3 = null;
 
-function Web3Setter(props) {  
+function Web3Setter(props) {
   if (web3 === null) {
     var app = props.app;
 
@@ -64,9 +64,9 @@ function Web3Setter(props) {
  */
 function ParseAccountDataResponse(json, app) {
   var newAccounts = [];
+  console.log(json);
 
-  json.account_values.forEach(accountData => {
-  	
+  json.accounts.forEach(accountData => {
     var account = {
       address: accountData.address,
 
@@ -74,7 +74,9 @@ function ParseAccountDataResponse(json, app) {
       totalEthBorrow: accountData.total_borrow_value_in_eth.value,
 
       // how much the borrower has supplied in ETH
-      totalEthSupply: accountData.total_supply_value_in_eth.value,
+      totalEthSupply: accountData.total_collateral_value_in_eth.value,
+
+      health: accountData.health.value,
 
       // when this borrower was last updated (ETH block)
       blockUpdated: accountData.block_updated
@@ -92,7 +94,7 @@ function ParseAccountDataResponse(json, app) {
 
       if (urlParams.has("address")) {
         var addressInput = urlParams.get("address");
-        
+
         // validate the address input before assuming it's a valid address
         if (web3.web3js.utils.isAddress(addressInput)) {
           inspectedAddressParam = addressInput;
@@ -120,8 +122,8 @@ class App extends Component {
       inspected_address: "",
       // the state of that address (risky, safe, unsafe) TODO this should be wrapped in a single address object
       inspected_address_state : "",
-      
-      // used when inspecting an address to hold how much the account has borrowed or supplied 
+
+      // used when inspecting an address to hold how much the account has borrowed or supplied
       borrow_balances: {},
       supply_balances: {},
       // which balances are currently being requested from server
@@ -134,7 +136,7 @@ class App extends Component {
 
       // the asset that the user has toggled to repay for the borrow
       asset_repay: "",
-      // the asset that the user has toggled to collect from borrower      
+      // the asset that the user has toggled to collect from borrower
       asset_collect: "",
 
       // holds the submitted liquidation transation hash
@@ -164,14 +166,14 @@ class App extends Component {
 
       MIN_COLLATERAL_RATIO : 0,
       SAFE_COLLATERAL_RATIO : 0
-    };   
+    };
   }
 
   componentDidMount() {}
 
   render() {
   	// if we're inspecting an address
-    if (this.state.inspected_address.length > 0) {    	
+    if (this.state.inspected_address.length > 0) {
       return (
         <AddressInspector app={this} />
       );
@@ -201,7 +203,7 @@ class App extends Component {
 
     this.state.TOKENS.forEach((t) => {
       if ((t.address in this.state.allowance_states) === false) {
-        
+
         var tokenContract = new web3.web3js.eth.Contract(ERC20.ABI, t.address);
 
         tokenContract.methods.allowance(web3.account, this.state.LIQUIDATION_ADDRESS).call(function(error, allowance) {
@@ -237,31 +239,33 @@ class App extends Component {
 
     if (web3.networkId === this.state.MAIN_NETWORK_ID) {
       // mainnet
-      URL = "https://api.compound.finance/api/risk/v1/get_account_values";
+      URL = "https://api.compound.finance/api/v2/account";
     } else if (web3.networkId === this.state.STAGING_NETWORK_ID) {
-      // Staging 
+      // Staging
       URL = "https://api.stage.compound.finance/api/risk/v1/get_account_values";
     }
 
     axios({
-      method: "post",
+      method: "GET",
       url: URL,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
         // ,'compound-api-key' : 'xxx' TODO implement this when CORS response headers are fixed
-      },
-      // TODO put input fields on main page for user to set
-      data: {
-        page_size: 100,
-        page_number: 1,
-        min_borrow_value_in_eth: {
-          value: "10000000000000000"
-        },
-        max_collateral_ratio: {
-          value: "10"
-        }
       }
+      // TODO put input fields on main page for user to set
+      // data: {
+      //   page_size: 100,
+      //   page_number: 1,
+      //   min_borrow_value_in_eth: {
+      //     value: "1"
+      //   },
+      //   max_health: { "value": "1.0" },
+      //   max_collateral_ratio: {
+      //     value: "10"
+      //   },
+      //   "block_number": 0
+      // }
     }).then(response => {
         console.log(response);
 
