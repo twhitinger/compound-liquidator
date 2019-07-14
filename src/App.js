@@ -28,8 +28,8 @@ function Web3Setter(props) {
       app.state.MONEY_MARKET_ABI = Compound.moneyMarketABI;
       app.state.MONEY_MARKET_ADDRESS = Compound.moneyMarketAddress;
 
-      app.state.CETH_ABI = Compound.cETHAbi;
-      app.state.CETH_ADDRESS = Compound.cETHAddress;
+      app.state.ORACLE_ADDRESS = Compound.oracleAddress;
+      app.state.ORACLE_ABI = Compound.oracleAbi;
 
       app.state.COMPTROLLER_ABI = Compound.comptrollerAbi;
       app.state.COMPTROLLER_ADDRESS = Compound.comptrollerAddress;
@@ -214,8 +214,6 @@ class App extends Component {
     // find out how much the liquidation address can spend on user's behalf. If 0 then the token is not "enabled" for liquidation
     let that = this;
 
-    var compoundContract = new web3.web3js.eth.Contract(this.state.MONEY_MARKET_ABI, this.state.MONEY_MARKET_ADDRESS);
-
     var comptrollerContract = new web3.web3js.eth.Contract(this.state.COMPTROLLER_ABI, this.state.COMPTROLLER_ADDRESS);
 
     console.log('COMPTROLLER BELLOW');
@@ -226,10 +224,10 @@ class App extends Component {
     });
 
     this.state.TOKENS.forEach((t) => {
+      console.log(t);
       if ((t.address in this.state.allowance_states) === false) {
 
-        var tokenContract = new web3.web3js.eth.Contract(ERC20.ABI, t.address);
-        console.log(tokenContract);
+        var tokenContract = new web3.web3js.eth.Contract(t.abi, t.address);
         tokenContract.methods.allowance(web3.account, this.state.LIQUIDATION_ADDRESS).call(function(error, allowance) {
           if (error === null) {
             if (allowance > 0) {
@@ -243,8 +241,11 @@ class App extends Component {
 
       if ((t.address in this.state.asset_prices) === false) {
         var tokenDecimals = Math.pow(10, t.decimals);
-
-        compoundContract.methods.assetPrices(t.address).call(function(error, price) {
+        var oracleContract = new web3.web3js.eth.Contract(this.state.ORACLE_ABI, this.state.ORACLE_ADDRESS);
+        console.log(oracleContract);
+        console.log('we calleing price!');
+        oracleContract.methods.getPrice(t.regularAddress).call(function(error, price) {
+          console.log(price);
           if (error === null) {
             price = price / tokenDecimals;
 
