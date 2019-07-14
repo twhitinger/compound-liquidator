@@ -28,6 +28,12 @@ function Web3Setter(props) {
       app.state.MONEY_MARKET_ABI = Compound.moneyMarketABI;
       app.state.MONEY_MARKET_ADDRESS = Compound.moneyMarketAddress;
 
+      app.state.CETH_ABI = Compound.cETHAbi;
+      app.state.CETH_ADDRESS = Compound.cETHAddress;
+
+      app.state.COMPTROLLER_ABI = Compound.comptrollerAbi;
+      app.state.COMPTROLLER_ADDRESS = Compound.comptrollerAddress;
+
       app.state.TOKENS = Compound.tokens;
 
       app.state.LIQUIDATION_ADDRESS = Compound.liquidationAddress;
@@ -64,7 +70,9 @@ function Web3Setter(props) {
  */
 function ParseAccountDataResponse(json, app) {
   var newAccounts = [];
+
   console.log(json);
+
 
   json.accounts.forEach(accountData => {
     var account = {
@@ -73,10 +81,14 @@ function ParseAccountDataResponse(json, app) {
       // how much the borrower has borrowed in ETH
       totalEthBorrow: accountData.total_borrow_value_in_eth.value,
 
+      account_tokens: accountData.tokens,
+
       // how much the borrower has supplied in ETH
       totalEthSupply: accountData.total_collateral_value_in_eth.value,
 
       health: accountData.health.value,
+
+      liquidation_incentive: accountData.liquidation_incentive,
 
       // when this borrower was last updated (ETH block)
       blockUpdated: accountData.block_updated
@@ -105,9 +117,12 @@ function ParseAccountDataResponse(json, app) {
     console.log(e);
   }
 
+  var discount = json.liquidation_incentive;
+
   app.setState({
     accounts: newAccounts,
-    inspected_address : inspectedAddressParam
+    inspected_address : inspectedAddressParam,
+    liquidationDiscount: discount
   });
 }
 
@@ -201,11 +216,20 @@ class App extends Component {
 
     var compoundContract = new web3.web3js.eth.Contract(this.state.MONEY_MARKET_ABI, this.state.MONEY_MARKET_ADDRESS);
 
+    var comptrollerContract = new web3.web3js.eth.Contract(this.state.COMPTROLLER_ABI, this.state.COMPTROLLER_ADDRESS);
+
+    console.log('COMPTROLLER BELLOW');
+    console.log(comptrollerContract);
+
+    comptrollerContract.methods.getAccountLiquidity("0xf21fbf3ebc41828407f31d4c511267577badbc45").call(function(error, res) {
+      console.log(res);
+    });
+
     this.state.TOKENS.forEach((t) => {
       if ((t.address in this.state.allowance_states) === false) {
 
         var tokenContract = new web3.web3js.eth.Contract(ERC20.ABI, t.address);
-
+        console.log(tokenContract);
         tokenContract.methods.allowance(web3.account, this.state.LIQUIDATION_ADDRESS).call(function(error, allowance) {
           if (error === null) {
             if (allowance > 0) {

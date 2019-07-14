@@ -7,6 +7,9 @@ import "react-table/react-table.css";
 
 import "./AccountsTable.css";
 
+import { useWeb3Context } from "web3-react/hooks";
+
+var web3;
 let app;
 
 function InspectAddress(address, state) {
@@ -16,15 +19,32 @@ function InspectAddress(address, state) {
   });
 }
 
+function liquidate(address, state, supplied, borrowed) {
+  console.log(app);
+  var maxRepayAmountInEth = ((app.state.MIN_COLLATERAL_RATIO * borrowed) - supplied) / (app.state.MIN_COLLATERAL_RATIO - app.state.liquidationDiscount - 1);
+  maxRepayAmountInEth /= 1e18;
+  console.log(maxRepayAmountInEth);
+
+  var comptrollerContract = new web3.web3js.eth.Contract(app.state.COMPTROLLER_ABI, app.state.COMPTROLLER_ADDRESS);
+
+  var cETHContract = new web3.web3js.eth.Contract(app.state.COMPTROLLER_ABI, app.state.COMPTROLLER_ADDRESS);
+
+  console.log(comptrollerContract);
+
+  comptrollerContract.methods.getAccountLiquidity(address).call(function(err, res) {
+    console.log(res);
+  });
+}
+
 function AccountsTable(props) {
   app = props.app;
 
+  web3 = useWeb3Context();
   const data = [];
 
   console.log(props.accounts);
 
   props.accounts.forEach(account => {
-    console.log(account.totalEthSupply);
     var supplyAmount = (account.totalEthSupply / 1).toFixed(6);
     var borrowAmount = (account.totalEthBorrow / 1).toFixed(6);
 
@@ -121,15 +141,16 @@ function AccountsTable(props) {
       )
     },
     {
-      Header: "",
+      Header: "Liquidate",
       accessor: "liquidate",
       maxWidth: 200,
       Cell: row => (
         <button
-          className="InspectButton"
-          onClick={() => InspectAddress(row.row.address, row.original.state)}
+          className="liquidate-button"
+          onClick={() => liquidate(row.row.address, row.original.state, row.row.supply, row.row.borrow)}
+          disabled={false}
         >
-          Inspect
+          Liquidate
         </button>
       )
     }

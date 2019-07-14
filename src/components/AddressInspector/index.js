@@ -48,14 +48,14 @@ function OnRepaySliderValueChange() {
     var estimatedCollectionAmountInEth = (repayAmount * assetRepayExchangeRate) * (1 + app.state.liquidationDiscount);
     // then get the exchange rate for the collection asset
     var assetCollectExchangeRate = app.state.asset_prices[assetCollateralAddress];
-    // console.log(assetCollectExchangeRate);
+    console.log(assetCollectExchangeRate);
     // and determine how much the user will receive in the collection asset
     var estimatedCollectionAmountInAsset = (estimatedCollectionAmountInEth / assetCollectExchangeRate).toFixed(6);
-      
+
     // the exchange rate between the asset that we're repaying / collecting
     var repayForCollectExchangeRate = (repayAmount / estimatedCollectionAmountInAsset).toFixed(4);
 
-    liduidationDetailsText.innerText = "You will collect an (estimated) ~" + estimatedCollectionAmountInAsset + " " + 
+    liduidationDetailsText.innerText = "You will collect an (estimated) ~" + estimatedCollectionAmountInAsset + " " +
       app.state.asset_collect + ". (Rate = " + repayForCollectExchangeRate + " " + app.state.asset_repay + "/" +
       app.state.asset_collect + ")";
   } else {
@@ -91,7 +91,7 @@ function OnRefreshClicked() {
 function OnBackClicked() {
   accountLiquidity = 0;
   tokenAddressToBeRepaid = "";
-  
+
   app.setState({
     inspected_address: "",
 
@@ -137,11 +137,13 @@ function InitiateLiquidate() {
     var myAccount = web3.account;
     var targetAccount = app.state.inspected_address;
 
+    console.log(targetAccount);
+
     // determine the asset borrow and collateral
     var assetBorrow = "";
     var assetBorrowDecimals = 0;
 
-    var assetCollateral = ""; 
+    var assetCollateral = "";
 
     app.state.TOKENS.forEach(t => {
       if (t.symbol === app.state.asset_collect) {
@@ -194,20 +196,22 @@ function GetInspectedAccount() {
    	return inspected_account;
 }
 
-function AddressInspector (props) { 
+function AddressInspector (props) {
     app = props.app;
 
     web3 = useWeb3Context();
 
     if (accountLiquidity === 0) {
-      var compoundContract = new web3.web3js.eth.Contract(app.state.MONEY_MARKET_ABI, app.state.MONEY_MARKET_ADDRESS);
+      var compoundContract = new web3.web3js.eth.Contract(app.state.COMPTROLLER_ABI, app.state.COMPTROLLER_ADDRESS);
 
       // only if we're not fetching a pending balance
-      if (Object.keys(app.state.pending_balances).length === 0) {      
-        compoundContract.methods.getAccountLiquidity(app.state.inspected_address).call(function(error, result) {          
-          if (error == null) {              
+      if (Object.keys(app.state.pending_balances).length === 0) {
+        compoundContract.methods.getAccountLiquidity(app.state.inspected_address).call(function(error, result) {
+          console.log('WE GETTING THE LIQUIDITY');
+          console.log(result[1]);
+          if (error == null) {
               accountLiquidity = new BigNumber(result / 1e18);
-
+              console.log(accountLiquidity);
               var liquidateBlocked = (accountLiquidity >= 0);
 
               app.setState({
@@ -220,18 +224,6 @@ function AddressInspector (props) {
             } else {
               console.log(error);
             }
-        });
-      }
-
-      if (app.state.liquidationDiscount < 0) {
-        compoundContract.methods.liquidationDiscount().call(function(error, result) {
-          if (error == null) {
-            result = result / 1e18;
-            
-            app.setState({
-              liquidationDiscount : result
-            });
-          }
         });
       }
     }
@@ -248,10 +240,10 @@ function AddressInspector (props) {
     }
 
     var canLiquidate = false;
-    
+
     var liquidationText = ".";
 
-    var transactionSubmittedText = "";    
+    var transactionSubmittedText = "";
     var transationSubmittedLink = "";
     var transactionSpinnerVisibility = 'hidden';
 
@@ -273,7 +265,7 @@ function AddressInspector (props) {
 
         // calculate the maximum amount that the user can liquidate
         var inspected_account = GetInspectedAccount();
-        // we can actually liquidate more than just their account liquidity since after seizing assets from their supply, the account's ratio will go under 1.5x and so forth. 
+        // we can actually liquidate more than just their account liquidity since after seizing assets from their supply, the account's ratio will go under 1.5x and so forth.
         // this determines the maximum amount that we can seize in 1 liquidation
         var maxRepayAmountInEth = ((app.state.MIN_COLLATERAL_RATIO * inspected_account.totalEthBorrow) - inspected_account.totalEthSupply) / (app.state.MIN_COLLATERAL_RATIO - app.state.liquidationDiscount - 1);
         maxRepayAmountInEth /= 1e18; // convert from wei
@@ -316,7 +308,7 @@ function AddressInspector (props) {
       refreshDisabled = true;
     }
 
-    var stateColor = (app.state.inspected_address_state === 'risky') ? '#ffbf00' : 
+    var stateColor = (app.state.inspected_address_state === 'risky') ? '#ffbf00' :
       (app.state.inspected_address_state === 'safe') ? '#57d500' : '#ff2e00';
 
     var stateText = app.state.inspected_address_state;
@@ -331,31 +323,31 @@ function AddressInspector (props) {
         </div>
         <p><b>Account Liquidity:</b> {accountLiquidityDisplay}</p>
         <span><p><b>State: </b><span style={{color:stateColor}}>&#x25cf;</span> {stateText}</p></span>
-        
-        <p>Choose an asset to collect at {liquidationDiscountDisplay}% discount:</p> 
-        <BalanceTable app={app} balanceType="Supplied" stateProperty="asset_collect"/>        
+
+        <p>Choose an asset to collect at {liquidationDiscountDisplay}% discount:</p>
+        <BalanceTable app={app} balanceType="Supplied" stateProperty="asset_collect"/>
 
         <p>Choose a different asset to repay on behalf of borrower to return their <b>Account Liquidity</b> to 0:</p>
-        
+
         <BalanceTable app={app} balanceType="Borrowed" stateProperty="asset_repay"/>
         <br/>
 
         <div className="ButtonDiv">
           <button className="BackButton" onClick={() => OnBackClicked()}>Back</button>
-          
+
           <button className="LiquidateButton" disabled={!canLiquidate} id="LiquidateButton"
             onClick={() => InitiateLiquidate()}
           >Repay</button>
 
           <input type="range" onInput={() => OnRepaySliderValueChange()} min={0} max={100}
             className="slider" id="repaySlider" disabled={repaySliderDisabled}/>
-          
+
         </div>
 
         <p className="LiquidationDetails" id="LiquidationDetailsText">{liquidationText}</p>
-   
-        <div className="TransactionPendingDiv">          
-          <p className="TransactionSubmissionDetails">{transactionSubmittedText}<a href={transationSubmittedLink} 
+
+        <div className="TransactionPendingDiv">
+          <p className="TransactionSubmissionDetails">{transactionSubmittedText}<a href={transationSubmittedLink}
               rel="noopener noreferrer" target="_blank">{transationSubmittedLink}</a> <img style={{visibility:transactionSpinnerVisibility}} alt="loading" src="./small-loading.gif"/></p>
         </div>
       </div>
@@ -363,4 +355,4 @@ function AddressInspector (props) {
     )
   }
 
-  export default AddressInspector; 
+  export default AddressInspector;

@@ -80,6 +80,8 @@ function BalanceTable(props) {
       rowData.fetching = true;
     }
 
+    console.log(balanceType);
+
     if (balanceType === "Borrowed" && asset in app.state.borrow_balances) {
       rowData["Borrowed"] = app.state.borrow_balances[asset];
     } else if (
@@ -113,7 +115,7 @@ function BalanceTable(props) {
               app.setState({
                 borrow_balances: newBalances
               });
-            } else {            
+            } else {
               app.setState({});
             }
           });
@@ -136,7 +138,7 @@ function BalanceTable(props) {
               app.setState({
                 supply_balances: newBalances
               });
-            } else {              
+            } else {
               app.setState({});
             }
           });
@@ -144,12 +146,12 @@ function BalanceTable(props) {
     }
 
     if (("Supplied" in rowData && Number(rowData.Supplied) === 0) ||
-      ("Borrowed" in rowData && Number(rowData.Borrowed) === 0) ) {      
+      ("Borrowed" in rowData && Number(rowData.Borrowed) === 0) ) {
       rowData.clickable = false;
     } else {
       rowData.clickable = true;
     }
-    
+
     rowData.disabled = app.state.liquidateBlocked;
 
     data.push(rowData);
@@ -191,13 +193,13 @@ function BalanceTable(props) {
         } else if (row.original.allowed === false) {
           return (<button onClick={() => OnEnableTokenClicked(row)} className="EnableButton"><span role="img" aria-label="Checkmark">✅</span></button>)
         } else if (row.original.clickable) {
-          return (          
+          return (
             <input
               type="radio"
               className="LiquidateRadioInput"
               checked={app.state[stateProperty] === row.value}
               disabled={row.original.disabled}
-              onClick={() => {                
+              onClick={() => {
                 // reset the repayment slider position
                 var repaySlider = document.getElementById('repaySlider');
                 repaySlider.value = repaySlider.min;
@@ -215,13 +217,13 @@ function BalanceTable(props) {
                   });
 
                   // reset the liquidate button text if we have an asset to repay set
-                  if (app.state.asset_repay.length > 0) {                    
+                  if (app.state.asset_repay.length > 0) {
                     document.getElementById('LiquidateButton').innerText = "Repay 0 " + app.state.asset_repay;
                   }
                 }
               }}
               onChange={() => {}}
-            />          
+            />
           )
         } else {
           return <div/>
@@ -229,7 +231,7 @@ function BalanceTable(props) {
       }
     }
   ];
-  
+
   return (
     <ReactTable
       data={data}

@@ -2,13 +2,13 @@
 	display: inline;
 }
 
-.CurrentBlock {	
+.CurrentBlock {
 	float: right;
 }
 
 .AccountsTable {
 	margin-top:20px;
-	  margin-left:20px; 
+	  margin-left:20px;
   width: calc(100% - 40px);
 }
 
@@ -20,12 +20,12 @@
   text-align: right;
 }
 
-.InspectButton {	
-    width:100%; 
+.liquidate-button {	
+    width:100%;
 
     padding: 2px;
     text-align: center;
-    
+
     display: inline-block;
   	font-size: 12px;
 }
@@ -35,5 +35,5 @@ div.rt-tr {
 }
 
 .ReactTable {
-  
+
 }
