@@ -48,8 +48,8 @@ function BalanceTable(props) {
   web3 = useWeb3Context();
 
   var compoundContract = new web3.web3js.eth.Contract(
-    app.state.MONEY_MARKET_ABI,
-    app.state.MONEY_MARKET_ADDRESS
+    app.state.ORACLE_ABI,
+    app.state.ORACLE_ADDRESS
   );
 
   app.state.TOKENS.forEach(tokenData => {
@@ -81,7 +81,7 @@ function BalanceTable(props) {
     }
 
     console.log(balanceType);
-
+    console.log(app.state);
     if (balanceType === "Borrowed" && asset in app.state.borrow_balances) {
       rowData["Borrowed"] = app.state.borrow_balances[asset];
     } else if (

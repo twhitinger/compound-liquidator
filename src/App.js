@@ -25,8 +25,6 @@ function Web3Setter(props) {
     web3 = useWeb3Context();
 
     if (web3.networkId === app.state.MAIN_NETWORK_ID) {
-      app.state.MONEY_MARKET_ABI = Compound.moneyMarketABI;
-      app.state.MONEY_MARKET_ADDRESS = Compound.moneyMarketAddress;
 
       app.state.ORACLE_ADDRESS = Compound.oracleAddress;
       app.state.ORACLE_ABI = Compound.oracleAbi;
@@ -44,9 +42,6 @@ function Web3Setter(props) {
       app.state.MIN_COLLATERAL_RATIO = Compound.minCollateralRatio;
       app.state.SAFE_COLLATERAL_RATIO = Compound.safeCollateralRatio;
     } else if (web3.networkId === app.state.STAGING_NETWORK_ID) {
-      app.state.MONEY_MARKET_ABI = CompoundStaging.moneyMarketABI;
-      app.state.MONEY_MARKET_ADDRESS = CompoundStaging.moneyMarketAddress;
-
       app.state.TOKENS = CompoundStaging.tokens;
 
       app.state.LIQUIDATION_ADDRESS = CompoundStaging.liquidationAddress;

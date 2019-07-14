@@ -34,6 +34,7 @@ function OnRepaySliderValueChange() {
 
   // first determine which asset the user will be collecting
   app.state.TOKENS.forEach(t => {
+    console.log(t);
     if (t.symbol === app.state.asset_collect) {
       assetCollateralAddress = t.address;
     }
@@ -207,20 +208,20 @@ function AddressInspector (props) {
       // only if we're not fetching a pending balance
       if (Object.keys(app.state.pending_balances).length === 0) {
         compoundContract.methods.getAccountLiquidity(app.state.inspected_address).call(function(error, result) {
-          console.log('WE GETTING THE LIQUIDITY');
-          console.log(result[1]);
           if (error == null) {
-              accountLiquidity = new BigNumber(result / 1e18);
-              console.log(accountLiquidity);
-              var liquidateBlocked = (accountLiquidity >= 0);
+              if (Number(result[1]) <= 0) {
+                accountLiquidity = new BigNumber(result[2] / 1e18);
+                console.log(accountLiquidity);
+                var liquidateBlocked = (accountLiquidity >= 0);
 
-              app.setState({
-                liquidateBlocked : liquidateBlocked
-              });
+                app.setState({
+                  liquidateBlocked : liquidateBlocked
+                });
 
-              // reset the repay slider to min
-              var repaySlider = document.getElementById('repaySlider');
-              repaySlider.value = repaySlider.min;
+                // reset the repay slider to min
+                var repaySlider = document.getElementById('repaySlider');
+                repaySlider.value = repaySlider.min;
+              }
             } else {
               console.log(error);
             }
