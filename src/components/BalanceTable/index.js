@@ -80,7 +80,6 @@ function BalanceTable(props) {
       rowData.fetching = true;
     }
 
-    console.log(balanceType);
     if (balanceType === "Borrowed" && asset in app.state.borrow_balances) {
       rowData["Borrowed"] = app.state.borrow_balances[asset];
     } else if (
@@ -96,17 +95,15 @@ function BalanceTable(props) {
       rowData.fetching = true;
 
       if (balanceType === "Borrowed") {
-        console.log(borrowerAccount);
         tokenContract.methods
           .borrowBalanceCurrent(borrowerAccount)
           .call(function(error, result) {
             delete app.state.pending_balances[assetFetchKey];
-            console.log('result')
-            console.log(result);
             if (error === null) {
               var newBalances = app.state.borrow_balances;
 
-              var amount = Number((result / tokenDecimals).toFixed(4));
+              var amount = Number(result / tokenDecimals);
+              console.log(amount);
               if (amount === 0) {
                 amount = "0";
               }
@@ -127,12 +124,11 @@ function BalanceTable(props) {
             delete app.state.pending_balances[assetFetchKey];
 
             if (error === null) {
-              console.log('SUPPLY STUFF');
-              console.log(tokenData.address);
-              console.log(result);
               var newBalances = app.state.supply_balances;
 
               var amount = Number((result / tokenDecimals).toFixed(4));
+              console.log('amt supply')
+              console.log(amount);
               if (amount === 0) {
                 amount = "0";
               }
@@ -155,14 +151,10 @@ function BalanceTable(props) {
     } else {
       rowData.clickable = true;
     }
-
-    console.log(app.state.liquidateBlocked);
     rowData.disabled = app.state.liquidateBlocked;
 
     data.push(rowData);
   });
-
-  // console.log(data);
 
   var etherScanPrefix = app.state.ETHERSCAN_PREFIX;
 

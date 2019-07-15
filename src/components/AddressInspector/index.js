@@ -34,7 +34,6 @@ function OnRepaySliderValueChange() {
 
   // first determine which asset the user will be collecting
   app.state.TOKENS.forEach(t => {
-    console.log(t);
     if (t.symbol === app.state.asset_collect) {
       assetCollateralAddress = t.address;
     }
@@ -209,10 +208,8 @@ function AddressInspector (props) {
       if (Object.keys(app.state.pending_balances).length === 0) {
         compoundContract.methods.getAccountLiquidity(app.state.inspected_address).call(function(error, result) {
           if (error == null) {
-            console.log(result);
               if (Number(result[1]) <= 0) {
                 accountLiquidity = new BigNumber(result[2] / 1e18);
-                console.log(accountLiquidity);
 
                 app.setState({
                   liquidateBlocked : false
@@ -233,9 +230,6 @@ function AddressInspector (props) {
     var refreshDisabled = false;
 
     // but check that we have all the borrow balances fetched
-    console.log('do we have them fetched');
-    console.log(Object.keys(app.state.borrow_balances));
-    console.log(Object.keys(app.state.TOKENS).length);
     if ((Object.keys(app.state.borrow_balances).length) < Object.keys(app.state.TOKENS).length) {
       refreshDisabled = true;
     } else if ((Object.keys(app.state.supply_balances).length) < Object.keys(app.state.TOKENS).length) {
@@ -268,22 +262,9 @@ function AddressInspector (props) {
         });
 
         // calculate the maximum amount that the user can liquidate
-        var inspected_account = GetInspectedAccount();
         // we can actually liquidate more than just their account liquidity since after seizing assets from their supply, the account's ratio will go under 1.5x and so forth.
         // this determines the maximum amount that we can seize in 1 liquidation
-        var maxRepayAmountInEth = ((app.state.MIN_COLLATERAL_RATIO * inspected_account.totalEthBorrow) - inspected_account.totalEthSupply) / (app.state.MIN_COLLATERAL_RATIO - app.state.liquidationDiscount - 1);
-        maxRepayAmountInEth /= 1e18; // convert from wei
-
-        if (tokenAddressToBeRepaid in app.state.asset_prices) {
-          var assetRepayExchangeRate = app.state.asset_prices[tokenAddressToBeRepaid];
-
-          maxRepayAmount = (maxRepayAmountInEth / assetRepayExchangeRate);
-
-          // factor in the borrower's balance as the max repay amount too (can't pay more than they borrowed!)
-          maxRepayAmount = Math.min(maxRepayAmount, app.state.borrow_balances[tokenAddressToBeRepaid]);
-        } else {
-          maxRepayAmount = 0;
-        }
+        maxRepayAmount = app.state.borrow_balances[tokenAddressToBeRepaid] * app.state.close_factor;
       } else {
         liquidationText = "Unable to repay " + app.state.asset_repay + " and collect same asset " + app.state.asset_collect + ".";
       }

@@ -83,6 +83,8 @@ function ParseAccountDataResponse(json, app) {
 
       health: accountData.health.value,
 
+      close_factor: accountData.close_factor,
+
       liquidation_incentive: accountData.liquidation_incentive,
 
       // when this borrower was last updated (ETH block)
@@ -113,11 +115,13 @@ function ParseAccountDataResponse(json, app) {
   }
 
   var discount = json.liquidation_incentive;
+  var close_factor = json.close_factor;
 
   app.setState({
     accounts: newAccounts,
     inspected_address : inspectedAddressParam,
-    liquidationDiscount: discount
+    liquidationDiscount: discount,
+    close_factor: close_factor
   });
 }
 
