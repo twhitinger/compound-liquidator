@@ -156,6 +156,7 @@ function BalanceTable(props) {
       rowData.clickable = true;
     }
 
+    console.log(app.state.liquidateBlocked);
     rowData.disabled = app.state.liquidateBlocked;
 
     data.push(rowData);

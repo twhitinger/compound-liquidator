@@ -250,7 +250,7 @@ class App extends Component {
 
     if (web3.networkId === this.state.MAIN_NETWORK_ID) {
       // mainnet
-      URL = "https://api.compound.finance/api/v2/account?addresses[]=0xd062eeb318295a09d4262135ef0092979552afe6";
+      URL = "https://api.compound.finance/api/v2/account";
     } else if (web3.networkId === this.state.STAGING_NETWORK_ID) {
       // Staging
       URL = "https://api.stage.compound.finance/api/risk/v1/get_account_values";

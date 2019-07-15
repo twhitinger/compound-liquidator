@@ -209,13 +209,13 @@ function AddressInspector (props) {
       if (Object.keys(app.state.pending_balances).length === 0) {
         compoundContract.methods.getAccountLiquidity(app.state.inspected_address).call(function(error, result) {
           if (error == null) {
+            console.log(result);
               if (Number(result[1]) <= 0) {
                 accountLiquidity = new BigNumber(result[2] / 1e18);
                 console.log(accountLiquidity);
-                var liquidateBlocked = (accountLiquidity >= 0);
 
                 app.setState({
-                  liquidateBlocked : liquidateBlocked
+                  liquidateBlocked : false
                 });
 
                 // reset the repay slider to min
@@ -233,6 +233,9 @@ function AddressInspector (props) {
     var refreshDisabled = false;
 
     // but check that we have all the borrow balances fetched
+    console.log('do we have them fetched');
+    console.log(Object.keys(app.state.borrow_balances));
+    console.log(Object.keys(app.state.TOKENS).length);
     if ((Object.keys(app.state.borrow_balances).length) < Object.keys(app.state.TOKENS).length) {
       refreshDisabled = true;
     } else if ((Object.keys(app.state.supply_balances).length) < Object.keys(app.state.TOKENS).length) {
