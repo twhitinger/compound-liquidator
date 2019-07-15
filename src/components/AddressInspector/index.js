@@ -120,7 +120,7 @@ function OnBackClicked() {
 
 function OnCopyAddressClicked() {
   // build the URL we want to copy
-  var url = "https://conlan.github.io/compound-liquidator?address=" + app.state.inspected_address;
+  var url = "https://chiragkhatri.me/compound-liquidator/?address=" + app.state.inspected_address;
 
   // hack to copy text to clipboard
   const el = document.createElement('textarea');

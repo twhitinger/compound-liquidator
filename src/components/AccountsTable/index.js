@@ -150,7 +150,7 @@ function AccountsTable(props) {
         className="-striped"
       />
       <p>
-        <a href="https://github.com/conlan/compound-liquidator" target="_blank" rel="noopener noreferrer">
+        <a href="https://github.com/ckhatri/compound-liquidator" target="_blank" rel="noopener noreferrer">
           Github
         </a>{" "}
         |{" "}
