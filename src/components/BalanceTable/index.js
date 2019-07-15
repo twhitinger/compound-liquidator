@@ -47,17 +47,19 @@ function BalanceTable(props) {
 
   web3 = useWeb3Context();
 
-  var compoundContract = new web3.web3js.eth.Contract(
-    app.state.ORACLE_ABI,
-    app.state.ORACLE_ADDRESS
-  );
-
   app.state.TOKENS.forEach(tokenData => {
     var isAllowed = false;
 
     if (tokenData.address in app.state.allowance_states) {
       isAllowed = app.state.allowance_states[tokenData.address];
     }
+
+    var tokenContract = new web3.web3js.eth.Contract(
+      tokenData.abi,
+      tokenData.address
+    );
+
+    console.log(tokenContract);
 
     var rowData = {
       symbol: tokenData.symbol,
@@ -81,7 +83,6 @@ function BalanceTable(props) {
     }
 
     console.log(balanceType);
-    console.log(app.state);
     if (balanceType === "Borrowed" && asset in app.state.borrow_balances) {
       rowData["Borrowed"] = app.state.borrow_balances[asset];
     } else if (
@@ -97,11 +98,13 @@ function BalanceTable(props) {
       rowData.fetching = true;
 
       if (balanceType === "Borrowed") {
-        compoundContract.methods
-          .getBorrowBalance(borrowerAccount, asset)
+        console.log(borrowerAccount);
+        tokenContract.methods
+          .borrowBalanceCurrent(borrowerAccount)
           .call(function(error, result) {
             delete app.state.pending_balances[assetFetchKey];
-
+            console.log('result')
+            console.log(result);
             if (error === null) {
               var newBalances = app.state.borrow_balances;
 
@@ -120,8 +123,8 @@ function BalanceTable(props) {
             }
           });
       } else {
-        compoundContract.methods
-          .getSupplyBalance(borrowerAccount, asset)
+        tokenContract.methods
+          .balanceOf(borrowerAccount)
           .call(function(error, result) {
             delete app.state.pending_balances[assetFetchKey];
 
