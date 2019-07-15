@@ -21,8 +21,6 @@ function AccountsTable(props) {
 
   const data = [];
 
-  console.log(props.accounts);
-
   props.accounts.forEach(account => {
     var supplyAmount = (account.totalEthSupply / 1).toFixed(6);
     var borrowAmount = (account.totalEthBorrow / 1).toFixed(6);

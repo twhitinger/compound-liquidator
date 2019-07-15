@@ -46,29 +46,24 @@ function OnRepaySliderValueChange() {
   });
 
   var liduidationDetailsText = document.getElementById('LiquidationDetailsText');
-  console.log(app.state.asset_prices);
   if ((assetCollateralAddress !== null) && (repayAmount > 0)) {
     // first take the repay amount and convert to eth
     var assetRepayExchangeRate = app.state.asset_prices[tokenAddressToBeRepaid];
     var assetBorrowExchangeRate = app.state.asset_prices[assetCollateralAddress];
-    console.log(assetRepayExchangeRate);
-    console.log(repayAmount);
-    console.log(repayOgSymbol);
     // factor in the liquidation discount amount
     var estimatedCollectionAmount = 0;
     if (repayOgSymbol === "ETH") {
-      console.log(repayAmount);
-      console.log(assetRepayExchangeRate);
       estimatedCollectionAmount = repayAmount * assetRepayExchangeRate * app.state.liquidationDiscount / Math.pow(10, 12);
     } else if (assetOgSymbol === "ETH") {
         estimatedCollectionAmount = (repayAmount * (assetRepayExchangeRate) * app.state.liquidationDiscount);
     } else if (repayOgSymbol === "USDC") {
       estimatedCollectionAmount = (repayAmount * (assetRepayExchangeRate / Math.pow(10, 12) / assetBorrowExchangeRate) * app.state.liquidationDiscount);
+    } else if (assetOgSymbol === "USDC") {
+      estimatedCollectionAmount = (repayAmount * (assetBorrowExchangeRate * (assetRepayExchangeRate / Math.pow(10, 12))) * app.state.liquidationDiscount);
     }
       else {
       estimatedCollectionAmount = repayAmount * assetRepayExchangeRate / assetBorrowExchangeRate * app.state.liquidationDiscount;
     }
-    console.log(estimatedCollectionAmount);
 
     liduidationDetailsText.innerText = "You will collect an (estimated) ~" + estimatedCollectionAmount + " " +
       assetOgSymbol + ".";
@@ -157,12 +152,10 @@ function InitiateLiquidate() {
     var assetBorrowDecimals = 0;
 
     var assetCollateralAddress = "";
-    var assetCollateralAbi = "";
 
     app.state.TOKENS.forEach(t => {
       if (t.symbol === app.state.asset_collect) {
         assetCollateralAddress = t.address; // the asset we're collecting is the one that the target collateralized
-        assetCollateralAbi = t.abi;
       }
 
       if (t.symbol === app.state.asset_repay) {
@@ -198,9 +191,10 @@ function InitiateLiquidate() {
         }
     })
     } else {
-      console.log(requestAmountClose);
       tokenContract.methods.liquidateBorrow(targetAccount, requestAmountClose, assetCollateralAddress).send(
-        { from: myAccount }
+        {
+          from: myAccount
+        }
       ).on('transactionHash', (txHash) => {
         // clear out the estimated collection liquidation details
         document.getElementById('LiquidationDetailsText').innerText = ".";
@@ -220,17 +214,17 @@ function InitiateLiquidate() {
 }
 }
 
-function GetInspectedAccount() {
-	var inspected_account = null;
-
-    app.state.accounts.forEach(account => {
-    	if (account.address.toLowerCase() == app.state.inspected_address.toLowerCase()) {
-    		inspected_account = account;
-    	}
-   	});
-
-   	return inspected_account;
-}
+// function GetInspectedAccount() {
+// 	var inspected_account = null;
+//
+//     app.state.accounts.forEach(account => {
+//     	if (account.address.toLowerCase() == app.state.inspected_address.toLowerCase()) {
+//     		inspected_account = account;
+//     	}
+//    	});
+//
+//    	return inspected_account;
+// }
 
 function AddressInspector (props) {
     app = props.app;
@@ -244,19 +238,23 @@ function AddressInspector (props) {
       if (Object.keys(app.state.pending_balances).length === 0) {
         compoundContract.methods.getAccountLiquidity(app.state.inspected_address).call(function(error, result) {
           if (error == null) {
-            app.setState({
-              liquidateBlocked : false
-            })
               if (Number(result[1]) <= 0) {
-                accountLiquidity = new BigNumber(result[2] / 1e18);
+                accountLiquidity = new BigNumber(result[2]);
 
                 app.setState({
-                  liquidateBlocked : false
+                  liquidateBlocked : false,
+                  accountLiquidatable: true
                 });
 
                 // reset the repay slider to min
                 var repaySlider = document.getElementById('repaySlider');
                 repaySlider.value = repaySlider.min;
+              } else {
+                accountLiquidity = new BigNumber(result[1]);
+                app.setState({
+                  liquidateBlocked : true,
+                  accountLiquidatable: false
+                });
               }
             } else {
               console.log(error);
@@ -326,10 +324,11 @@ function AddressInspector (props) {
 
     var accountLiquidityDisplay = "";
     if (accountLiquidity !== 0) {
-      accountLiquidityDisplay = accountLiquidity + " ETH";
-    } else {
-      // if account liquidity not set then disable refresh
-      refreshDisabled = true;
+      if (!app.state.accountLiquidatable) {
+        accountLiquidityDisplay = "Account liquidity is over 1 and cannot be liquidated.";
+      } else {
+        accountLiquidityDisplay = "Account liquidity is under 1 and can be liquidated."
+      }
     }
 
     var stateColor = (app.state.inspected_address_state === 'risky') ? '#ffbf00' :

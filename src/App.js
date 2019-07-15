@@ -6,8 +6,6 @@ import AddressInspector from "./components/AddressInspector/index.js";
 import Compound from "./constants/Compound.js"
 import CompoundStaging from "./constants/CompoundStaging.js"
 
-import ERC20 from "./constants/ERC20.js"
-
 import axios from "axios";
 
 import { useWeb3Context } from "web3-react/hooks";
@@ -65,9 +63,6 @@ function Web3Setter(props) {
  */
 function ParseAccountDataResponse(json, app) {
   var newAccounts = [];
-
-  console.log(json);
-
 
   json.accounts.forEach(accountData => {
     var account = {
@@ -213,8 +208,6 @@ class App extends Component {
     // find out how much the liquidation address can spend on user's behalf. If 0 then the token is not "enabled" for liquidation
     let that = this;
 
-    var comptrollerContract = new web3.web3js.eth.Contract(this.state.COMPTROLLER_ABI, this.state.COMPTROLLER_ADDRESS);
-
     this.state.TOKENS.forEach((t) => {
       if ((t.address in this.state.allowance_states) === false) {
 
@@ -236,8 +229,6 @@ class App extends Component {
         oracleContract.methods.getPrice(t.regularAddress).call(function(error, price) {
           if (error === null) {
             price = price / tokenDecimals;
-
-            // console.log(t.symbol + " = " + price);
             that.state.asset_prices[t.address] = price;
           }
         });
@@ -276,8 +267,6 @@ class App extends Component {
         block_number: 0
       }
     }).then(response => {
-        console.log(response);
-
         ParseAccountDataResponse(response.data, this);
       })
       .catch(error => {

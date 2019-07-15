@@ -103,7 +103,6 @@ function BalanceTable(props) {
               var newBalances = app.state.borrow_balances;
 
               var amount = Number(result / tokenDecimals);
-              console.log(amount);
               if (amount === 0) {
                 amount = "0";
               }
@@ -127,8 +126,6 @@ function BalanceTable(props) {
               var newBalances = app.state.supply_balances;
 
               var amount = Number((result / tokenDecimals).toFixed(4));
-              console.log('amt supply')
-              console.log(amount);
               if (amount === 0) {
                 amount = "0";
               }
