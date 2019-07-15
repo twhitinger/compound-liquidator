@@ -62,7 +62,7 @@ function OnRepaySliderValueChange() {
     // and determine how much the user will receive in the collection asset
 
     // the exchange rate between the asset that we're repaying / collecting
-    var repayForCollectExchangeRate = (assetCollectExchangeRate / assetRepayExchangeRate) * app.state.liquidation_discount;
+    var repayForCollectExchangeRate = (assetCollectExchangeRate / assetRepayExchangeRate) * app.state.liquidationDiscount;
     if (assetOgSymbol === "ETH") {
       repayForCollectExchangeRate /= Math.pow(10, 12);
     } else {
