@@ -46,32 +46,33 @@ function OnRepaySliderValueChange() {
   });
 
   var liduidationDetailsText = document.getElementById('LiquidationDetailsText');
-
+  console.log(app.state.asset_prices);
   if ((assetCollateralAddress !== null) && (repayAmount > 0)) {
     // first take the repay amount and convert to eth
     var assetRepayExchangeRate = app.state.asset_prices[tokenAddressToBeRepaid];
+    var assetBorrowExchangeRate = app.state.asset_prices[assetCollateralAddress];
+    console.log(assetRepayExchangeRate);
+    console.log(repayAmount);
+    console.log(repayOgSymbol);
     // factor in the liquidation discount amount
-    var estimatedCollectionAmount = (repayAmount * assetRepayExchangeRate) * app.state.liquidationDiscount;
-    console.log(estimatedCollectionAmount);
-    if (assetOgSymbol !== "ETH") {
-      estimatedCollectionAmount /= app.state.asset_prices['0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5'];
-      console.log(estimatedCollectionAmount);
-    }
-    // then get the exchange rate for the collection asset
-    var assetCollectExchangeRate = app.state.asset_prices[assetCollateralAddress];
-    // and determine how much the user will receive in the collection asset
-
-    // the exchange rate between the asset that we're repaying / collecting
-    var repayForCollectExchangeRate = (assetCollectExchangeRate / assetRepayExchangeRate) * app.state.liquidationDiscount;
-    if (assetOgSymbol === "ETH") {
-      repayForCollectExchangeRate /= Math.pow(10, 12);
+    var estimatedCollectionAmount = 0;
+    if (repayOgSymbol === "ETH") {
+      console.log(repayAmount);
+      console.log(assetRepayExchangeRate);
+      estimatedCollectionAmount = repayAmount * assetRepayExchangeRate * app.state.liquidationDiscount / Math.pow(10, 12);
+    } else if (assetOgSymbol === "ETH") {
+      if (repayOgSymbol === "USDC") {
+        estimatedCollectionAmount = (repayAmount * (assetRepayExchangeRate) * app.state.liquidationDiscount) / Math.pow(10, 12);
+      } else {
+        estimatedCollectionAmount = (repayAmount * (assetRepayExchangeRate) * app.state.liquidationDiscount);
+      }
     } else {
-      repayForCollectExchangeRate *= Math.pow(10, 12);
+      estimatedCollectionAmount = repayAmount * assetRepayExchangeRate / assetBorrowExchangeRate * app.state.liquidationDiscount;
     }
+    console.log(estimatedCollectionAmount);
 
     liduidationDetailsText.innerText = "You will collect an (estimated) ~" + estimatedCollectionAmount + " " +
-      assetOgSymbol + ". (Rate = " + repayForCollectExchangeRate + " " + repayOgSymbol + "/" +
-      assetOgSymbol + ")";
+      assetOgSymbol + ".";
   } else {
     liduidationDetailsText.innerText = ".";
   }
@@ -176,13 +177,12 @@ function InitiateLiquidate() {
 
     requestAmountClose = new BigNumber(requestAmountClose * assetBorrowDecimals).toFixed();
     var tokenContract = new web3.web3js.eth.Contract(assetBorrowAbi, assetBorrowAddress);
-
     // cETH address uses different liquidate function
     if (assetBorrowAddress === "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5") {
       tokenContract.methods.liquidateBorrow(targetAccount, assetCollateralAddress).send(
       {
         from: myAccount,
-        value: web3.toWei(requestAmountClose, "ether")
+        value: requestAmountClose
       }).on('transactionHash', (txHash) => {
         // clear out the estimated collection liquidation details
         document.getElementById('LiquidationDetailsText').innerText = ".";
@@ -245,6 +245,9 @@ function AddressInspector (props) {
       if (Object.keys(app.state.pending_balances).length === 0) {
         compoundContract.methods.getAccountLiquidity(app.state.inspected_address).call(function(error, result) {
           if (error == null) {
+            app.setState({
+              liquidateBlocked : false
+            })
               if (Number(result[1]) <= 0) {
                 accountLiquidity = new BigNumber(result[2] / 1e18);
 
