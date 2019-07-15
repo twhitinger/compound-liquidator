@@ -160,7 +160,7 @@ class App extends Component {
       liquidationDiscount : -1,
 
       // whether the user can choose assets on the address inspect. Blocked by default unless that account has a negative account liquidity
-      liquidateBlocked : false,
+      liquidateBlocked : true,
 
       currentBlock : "",
 
