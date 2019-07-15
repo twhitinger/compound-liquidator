@@ -325,7 +325,7 @@ function AddressInspector (props) {
         <p><b>Account Liquidity:</b> {accountLiquidityDisplay}</p>
         <span><p><b>State: </b><span style={{color:stateColor}}>&#x25cf;</span> {stateText}</p></span>
 
-        <p>Choose an asset to collect at {liquidationDiscountDisplay}% discount:</p>
+        <p>Choose an asset to collect at {liquidationDiscountDisplay-100}% discount:</p>
         <BalanceTable app={app} balanceType="Supplied" stateProperty="asset_collect"/>
 
         <p>Choose a different asset to repay on behalf of borrower to return their <b>Account Liquidity</b> to 0:</p>
