@@ -51,7 +51,7 @@ function OnRepaySliderValueChange() {
     // first take the repay amount and convert to eth
     var assetRepayExchangeRate = app.state.asset_prices[tokenAddressToBeRepaid];
     // factor in the liquidation discount amount
-    var estimatedCollectionAmount = (repayAmount * assetRepayExchangeRate) * (1 +0.05);
+    var estimatedCollectionAmount = (repayAmount * assetRepayExchangeRate) * app.state.liquidationDiscount;
     console.log(estimatedCollectionAmount);
     if (assetOgSymbol !== "ETH") {
       estimatedCollectionAmount /= app.state.asset_prices['0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5'];
