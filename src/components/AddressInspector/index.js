@@ -17,13 +17,14 @@ var tokenAddressToBeRepaid = "";
 
 function GetIntendedRepayAmount() {
   var repaySlider = document.getElementById('repaySlider');
-
-  return new BigNumber(repaySlider.value / repaySlider.max * maxRepayAmount).toFixed(4);
+  console.log(repaySlider.value / repaySlider.max * maxRepayAmount);
+  return Math.floor((repaySlider.value / repaySlider.max * maxRepayAmount));
 }
 
 function OnRepaySliderValueChange() {
   // update the liquidation button text
   var repayAmount = GetIntendedRepayAmount();
+  repayAmount = Math.floor(repayAmount);
 
   var liquidationButton = document.getElementById('LiquidateButton');
 
@@ -130,6 +131,7 @@ function OnCopyAddressClicked() {
 
 function InitiateLiquidate() {
   var requestAmountClose = GetIntendedRepayAmount();
+  console.log(requestAmountClose);
 
   if (Number(requestAmountClose) === 0) {
     window.alert("Please set an amount greater than 0.");
@@ -140,48 +142,78 @@ function InitiateLiquidate() {
     console.log(targetAccount);
 
     // determine the asset borrow and collateral
-    var assetBorrow = "";
+    var assetBorrowAddress = "";
+    var assetBorrowAbi = "";
     var assetBorrowDecimals = 0;
 
-    var assetCollateral = "";
+    var assetCollateralAddress = "";
+    var assetCollateralAbi = "";
 
     app.state.TOKENS.forEach(t => {
       if (t.symbol === app.state.asset_collect) {
-        assetCollateral = t.address; // the asset we're collecting is the one that the target collateralized
+        console.log(app.state.asset_collect);
+        assetCollateralAddress = t.address; // the asset we're collecting is the one that the target collateralized
+        assetCollateralAbi = t.abi;
       }
 
       if (t.symbol === app.state.asset_repay) {
-        assetBorrow = t.address; // the asset that the target borrowed is the one that we are repaying on behalf of them
+        console.log(app.state.asset_repay);
+        assetBorrowAddress = t.address; // the asset that the target borrowed is the one that we are repaying on behalf of them
+        assetBorrowAbi = t.abi;
 
         assetBorrowDecimals = Math.pow(10, t.decimals);
       }
     });
 
-    // TODO enforce user's balance available
-    requestAmountClose = new BigNumber(requestAmountClose * assetBorrowDecimals).toFixed();
 
     console.log(requestAmountClose);
 
-    var compoundContract = new web3.web3js.eth.Contract(app.state.LIQUIDATION_ABI, app.state.LIQUIDATION_ADDRESS);
+    var tokenContract = new web3.web3js.eth.Contract(assetBorrowAbi, assetBorrowAddress);
+    console.log(tokenContract);
 
-    compoundContract.methods.liquidateBorrow(targetAccount, assetBorrow, assetCollateral, requestAmountClose).send(
-      { from: myAccount }
-    ).on('transactionHash', (txHash) => {
-      // clear out the estimated collection liquidation details
-      document.getElementById('LiquidationDetailsText').innerText = ".";
+    // cETH address uses different liquidate function
+    if (assetBorrowAddress === "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5") {
+      console.log(web3.toWei(requestAmountClose, "ether"));
+      tokenContract.methods.liquidateBorrow(targetAccount, assetCollateralAddress).send(
+      {
+        from: myAccount,
+        value: web3.toWei(requestAmountClose, "ether")
+      }).on('transactionHash', (txHash) => {
+        // clear out the estimated collection liquidation details
+        document.getElementById('LiquidationDetailsText').innerText = ".";
 
-      app.setState({
-        asset_repay: "",
-        asset_collect: "",
+        app.setState({
+          asset_repay: "",
+          asset_collect: "",
 
-        repaySubmittedTxHash : txHash
-      });// TODO await confirmation
-    }).on("confirmation", (err, receipt) => {
-      if (app.state.repaySubmittedTxHash === receipt.transactionHash) {
-        OnRefreshClicked();
-      }
-  });
+          repaySubmittedTxHash : txHash
+        });// TODO await confirmation
+      }).on("confirmation", (err, receipt) => {
+        if (app.state.repaySubmittedTxHash === receipt.transactionHash) {
+          OnRefreshClicked();
+        }
+    })
+    } else {
+      console.log('non cETH!!');
+      tokenContract.methods.liquidateBorrow(targetAccount, 1, assetCollateralAddress).send(
+        { from: myAccount }
+      ).on('transactionHash', (txHash) => {
+        // clear out the estimated collection liquidation details
+        document.getElementById('LiquidationDetailsText').innerText = ".";
+
+        app.setState({
+          asset_repay: "",
+          asset_collect: "",
+
+          repaySubmittedTxHash : txHash
+        });// TODO await confirmation
+      }).on("confirmation", (err, receipt) => {
+        if (app.state.repaySubmittedTxHash === receipt.transactionHash) {
+          OnRefreshClicked();
+        }
+    });
   }
+}
 }
 
 function GetInspectedAccount() {
