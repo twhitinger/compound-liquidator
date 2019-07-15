@@ -2,6 +2,7 @@ export default {
   tokens : [
 		{
       		"symbol" : "cETH",
+          "ogSymbol": "ETH",
       		"address" : "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5",
           "regularAddress": "0x0000000000000000000000000000000000000001",
       		"decimals" : 18,
@@ -9,6 +10,7 @@ export default {
     },
     {
       		"symbol" : "cDAI",
+          "ogSymbol" : "DAI",
       		"address" : "0xf5dce57282a584d2746faf1593d3121fcac444dc",
           "regularAddress" : "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359",
       		"decimals" : 18,
@@ -16,6 +18,7 @@ export default {
     },
     {
       		"symbol" : "cUSDC",
+          "ogSymbol" : "USDC",
       		"address" : "0x39aa39c021dfbae8fac545936693ac917d5e7563",
           "regularAddress": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       		"decimals" : 6,
@@ -23,6 +26,7 @@ export default {
     },
     {
       		"symbol" : "cBAT",
+          "ogSymbol" : "BAT",
       		"address" : "0x6c8c6b02e7b2be14d4fa6022dfd6d75921d90e4e",
           "regularAddress": "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
       		"decimals" : 18,
@@ -30,6 +34,7 @@ export default {
     },
     {
       		"symbol" : "cREP",
+          "ogSymbol" : "REP",
       		"address" : "0x158079ee67fce2f58472a96584a73c7ab9ac95c1",
           "regularAddress": "0xe94327d07fc17907b4db788e5adf2ed424addff6",
       		"decimals" : 18,
@@ -37,6 +42,7 @@ export default {
     },
     {
       		"symbol" : "cZRX",
+          "ogSymbol" : "ZRX",
       		"address" : "0xb3319f5d18bc0d84dd1b4825dcde5d5f7266d407",
           "regularAddress": "0xe41d2489571d322189246dafa5ebde1f4699f498",
       		"decimals" : 18,

@@ -160,7 +160,7 @@ class App extends Component {
       liquidationDiscount : -1,
 
       // whether the user can choose assets on the address inspect. Blocked by default unless that account has a negative account liquidity
-      liquidateBlocked : true,
+      liquidateBlocked : false,
 
       currentBlock : "",
 
@@ -233,9 +233,7 @@ class App extends Component {
       if ((t.address in this.state.asset_prices) === false) {
         var tokenDecimals = Math.pow(10, t.decimals);
         var oracleContract = new web3.web3js.eth.Contract(this.state.ORACLE_ABI, this.state.ORACLE_ADDRESS);
-        console.log('we calling price!');
         oracleContract.methods.getPrice(t.regularAddress).call(function(error, price) {
-          console.log(price);
           if (error === null) {
             price = price / tokenDecimals;
 
