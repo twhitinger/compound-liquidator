@@ -259,26 +259,22 @@ class App extends Component {
     }
 
     axios({
-      method: "GET",
+      method: "POST",
       url: URL,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
         // ,'compound-api-key' : 'xxx' TODO implement this when CORS response headers are fixed
-      }
+      },
       // TODO put input fields on main page for user to set
-      // data: {
-      //   page_size: 100,
-      //   page_number: 1,
-      //   min_borrow_value_in_eth: {
-      //     value: "1"
-      //   },
-      //   max_health: { "value": "1.0" },
-      //   max_collateral_ratio: {
-      //     value: "10"
-      //   },
-      //   "block_number": 0
-      // }
+      data: {
+        page_size: 100,
+        min_borrow_value_in_eth: {
+          value: ".002"
+        },
+        max_health: { "value": "2.0" },
+        block_number: 0
+      }
     }).then(response => {
         console.log(response);
 
