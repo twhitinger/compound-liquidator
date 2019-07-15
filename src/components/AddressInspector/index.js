@@ -61,12 +61,11 @@ function OnRepaySliderValueChange() {
       console.log(assetRepayExchangeRate);
       estimatedCollectionAmount = repayAmount * assetRepayExchangeRate * app.state.liquidationDiscount / Math.pow(10, 12);
     } else if (assetOgSymbol === "ETH") {
-      if (repayOgSymbol === "USDC") {
-        estimatedCollectionAmount = (repayAmount * (assetRepayExchangeRate) * app.state.liquidationDiscount) / Math.pow(10, 12);
-      } else {
         estimatedCollectionAmount = (repayAmount * (assetRepayExchangeRate) * app.state.liquidationDiscount);
-      }
-    } else {
+    } else if (repayOgSymbol === "USDC") {
+      estimatedCollectionAmount = (repayAmount * (assetRepayExchangeRate / Math.pow(10, 12) / assetBorrowExchangeRate) * app.state.liquidationDiscount);
+    }
+      else {
       estimatedCollectionAmount = repayAmount * assetRepayExchangeRate / assetBorrowExchangeRate * app.state.liquidationDiscount;
     }
     console.log(estimatedCollectionAmount);
