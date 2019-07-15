@@ -211,15 +211,7 @@ class App extends Component {
 
     var comptrollerContract = new web3.web3js.eth.Contract(this.state.COMPTROLLER_ABI, this.state.COMPTROLLER_ADDRESS);
 
-    console.log('COMPTROLLER BELLOW');
-    console.log(comptrollerContract);
-
-    comptrollerContract.methods.getAccountLiquidity("0xf21fbf3ebc41828407f31d4c511267577badbc45").call(function(error, res) {
-      console.log(res);
-    });
-
     this.state.TOKENS.forEach((t) => {
-      console.log(t);
       if ((t.address in this.state.allowance_states) === false) {
 
         var tokenContract = new web3.web3js.eth.Contract(t.abi, t.address);
@@ -237,8 +229,7 @@ class App extends Component {
       if ((t.address in this.state.asset_prices) === false) {
         var tokenDecimals = Math.pow(10, t.decimals);
         var oracleContract = new web3.web3js.eth.Contract(this.state.ORACLE_ABI, this.state.ORACLE_ADDRESS);
-        console.log(oracleContract);
-        console.log('we calleing price!');
+        console.log('we calling price!');
         oracleContract.methods.getPrice(t.regularAddress).call(function(error, price) {
           console.log(price);
           if (error === null) {
@@ -259,7 +250,7 @@ class App extends Component {
 
     if (web3.networkId === this.state.MAIN_NETWORK_ID) {
       // mainnet
-      URL = "https://api.compound.finance/api/v2/account";
+      URL = "https://api.compound.finance/api/v2/account?addresses[]=0xd062eeb318295a09d4262135ef0092979552afe6";
     } else if (web3.networkId === this.state.STAGING_NETWORK_ID) {
       // Staging
       URL = "https://api.stage.compound.finance/api/risk/v1/get_account_values";

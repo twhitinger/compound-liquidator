@@ -59,8 +59,6 @@ function BalanceTable(props) {
       tokenData.address
     );
 
-    console.log(tokenContract);
-
     var rowData = {
       symbol: tokenData.symbol,
       address: tokenData.address,
@@ -124,11 +122,14 @@ function BalanceTable(props) {
           });
       } else {
         tokenContract.methods
-          .balanceOf(borrowerAccount)
+          .balanceOfUnderlying(borrowerAccount)
           .call(function(error, result) {
             delete app.state.pending_balances[assetFetchKey];
 
             if (error === null) {
+              console.log('SUPPLY STUFF');
+              console.log(tokenData.address);
+              console.log(result);
               var newBalances = app.state.supply_balances;
 
               var amount = Number((result / tokenDecimals).toFixed(4));
