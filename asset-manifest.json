@@ -1,7 +1,7 @@
 {
   "main.css": "/compound-liquidator/static/css/main.3a3f1eb8.chunk.css",
-  "main.js": "/compound-liquidator/static/js/main.bf083215.chunk.js",
-  "main.js.map": "/compound-liquidator/static/js/main.bf083215.chunk.js.map",
+  "main.js": "/compound-liquidator/static/js/main.02c724a6.chunk.js",
+  "main.js.map": "/compound-liquidator/static/js/main.02c724a6.chunk.js.map",
   "static/css/1.5c1eb7c0.chunk.css": "/compound-liquidator/static/css/1.5c1eb7c0.chunk.css",
   "static/js/1.5591224f.chunk.js": "/compound-liquidator/static/js/1.5591224f.chunk.js",
   "static/js/1.5591224f.chunk.js.map": "/compound-liquidator/static/js/1.5591224f.chunk.js.map",
@@ -27,13 +27,13 @@
   "runtime~main.js.map": "/compound-liquidator/static/js/runtime~main.adb2b11c.js.map",
   "static/css/1.5c1eb7c0.chunk.css.map": "/compound-liquidator/static/css/1.5c1eb7c0.chunk.css.map",
   "static/css/main.3a3f1eb8.chunk.css.map": "/compound-liquidator/static/css/main.3a3f1eb8.chunk.css.map",
-  "static/css/3.5c1eb7c0.chunk.css.map": "/compound-liquidator/static/css/3.5c1eb7c0.chunk.css.map",
   "static/css/2.5c1eb7c0.chunk.css.map": "/compound-liquidator/static/css/2.5c1eb7c0.chunk.css.map",
+  "static/css/3.5c1eb7c0.chunk.css.map": "/compound-liquidator/static/css/3.5c1eb7c0.chunk.css.map",
   "static/css/4.5c1eb7c0.chunk.css.map": "/compound-liquidator/static/css/4.5c1eb7c0.chunk.css.map",
   "static/css/5.5c1eb7c0.chunk.css.map": "/compound-liquidator/static/css/5.5c1eb7c0.chunk.css.map",
   "static/css/6.5c1eb7c0.chunk.css.map": "/compound-liquidator/static/css/6.5c1eb7c0.chunk.css.map",
   "static/css/7.71d6e94a.chunk.css.map": "/compound-liquidator/static/css/7.71d6e94a.chunk.css.map",
   "index.html": "/compound-liquidator/index.html",
-  "precache-manifest.78ab7a08146420dc389e02588e6c6e1f.js": "/compound-liquidator/precache-manifest.78ab7a08146420dc389e02588e6c6e1f.js",
+  "precache-manifest.b36f8e1f23f06733bb5ebe611b58e28f.js": "/compound-liquidator/precache-manifest.b36f8e1f23f06733bb5ebe611b58e28f.js",
   "service-worker.js": "/compound-liquidator/service-worker.js"
 }
