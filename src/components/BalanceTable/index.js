@@ -59,8 +59,15 @@ function BalanceTable(props) {
       tokenData.address
     );
 
+    var symbol;
+    if (balanceType === "Borrowed") {
+      symbol = tokenData.ogSymbol;
+    } else {
+      symbol = tokenData.symbol;
+    }
+
     var rowData = {
-      symbol: tokenData.symbol,
+      symbol: symbol,
       address: tokenData.address,
       liquidateAsset: tokenData.symbol,
       clickable : false,

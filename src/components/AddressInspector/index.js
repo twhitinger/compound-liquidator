@@ -26,7 +26,7 @@ function OnRepaySliderValueChange() {
 
   var liquidationButton = document.getElementById('LiquidateButton');
 
-  liquidationButton.innerText = "Repay " + repayAmount + " " + app.state.asset_repay;
+  liquidationButton.innerText = "Repay " + repayAmount + " " + app.state.asset_repay.substring(1);
 
   // update the estimated collection amount text
   var assetCollateralAddress = null;
