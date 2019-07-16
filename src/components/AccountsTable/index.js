@@ -154,6 +154,10 @@ function AccountsTable(props) {
           Github
         </a>{" "}
         |{" "}
+        <a href="https://github.com/ckhatri/compound-liquidator/blob/master/README.md" target="_blank" rel="noopener noreferrer">
+          README (mini-guide)
+        </a>{" "}
+        |{" "}
         <a href="https://compound.finance" target="_blank" rel="noopener noreferrer">
           Compound
         </a>{" "}
