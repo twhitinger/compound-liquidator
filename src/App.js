@@ -12,6 +12,8 @@ import { useWeb3Context } from "web3-react/hooks";
 
 import "./App.css";
 
+import ERC20 from "./constants/ERC20.js"
+
 // import sampleJson from "./samplejson.json";
 
 let web3 = null;
@@ -208,11 +210,13 @@ class App extends Component {
     // find out how much the liquidation address can spend on user's behalf. If 0 then the token is not "enabled" for liquidation
     let that = this;
 
+    // eth don't need to do allowance is not erc20.
+    that.state.allowance_states["0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5"] = true;
+
     this.state.TOKENS.forEach((t) => {
       if ((t.address in this.state.allowance_states) === false) {
-
-        var tokenContract = new web3.web3js.eth.Contract(t.abi, t.address);
-        tokenContract.methods.allowance(web3.account, this.state.LIQUIDATION_ADDRESS).call(function(error, allowance) {
+        var tokenContract = new web3.web3js.eth.Contract(ERC20.ABI, t.regularAddress);
+        tokenContract.methods.allowance(web3.account, t.address).call(function(error, allowance) {
           if (error === null) {
             if (allowance > 0) {
               that.state.allowance_states[t.address] = true;

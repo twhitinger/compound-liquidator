@@ -14,10 +14,9 @@ let web3;
 function OnEnableTokenClicked (row) {
   var tokenAddress = row.original.address;
 
-  var tokenContract = new web3.web3js.eth.Contract(ERC20.ABI, tokenAddress);
-
+  var tokenContract = new web3.web3js.eth.Contract(ERC20.ABI, row.original.ogAddress);
   // approve maximum amount of tokens
-  tokenContract.methods.approve(app.state.LIQUIDATION_ADDRESS, new BigNumber(2**(256) - 1).toFixed() ).send(
+  tokenContract.methods.approve(tokenAddress, new BigNumber(2**(100) - 1).toFixed() ).send(
     { from: web3.account }
   ).on('transactionHash', (txHash) => {
     console.log("Transaction submitted: " + app.state.ETHERSCAN_PREFIX + "tx/" + txHash);
@@ -69,6 +68,7 @@ function BalanceTable(props) {
     var rowData = {
       symbol: symbol,
       address: tokenData.address,
+      ogAddress: tokenData.regularAddress,
       liquidateAsset: tokenData.symbol,
       clickable : false,
       disabled : true,
