@@ -99,6 +99,10 @@ function ParseAccountDataResponse(json, app) {
       // when this borrower was last updated (ETH block)
       blockUpdated: accountData.block_updated
     };
+    // if (filter(accountData.tokens)) {
+    //   newAccounts.push(account);
+    // }
+
     newAccounts.push(account);
   });
 
