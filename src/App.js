@@ -18,6 +18,18 @@ import ERC20 from "./constants/ERC20.js"
 
 let web3 = null;
 
+function filter(tokens) {
+  var usdcExists = false;
+  tokens.forEach((token) => {
+    if (token.address === "0x39aa39c021dfbae8fac545936693ac917d5e7563") {
+      if (token.borrow_balance_underlying.value > 0) {
+        usdcExists = true;
+      }
+    }
+  })
+  return usdcExists;
+}
+
 function Web3Setter(props) {
   if (web3 === null) {
     var app = props.app;
@@ -87,7 +99,6 @@ function ParseAccountDataResponse(json, app) {
       // when this borrower was last updated (ETH block)
       blockUpdated: accountData.block_updated
     };
-
     newAccounts.push(account);
   });
 

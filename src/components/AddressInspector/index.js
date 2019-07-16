@@ -56,8 +56,11 @@ function OnRepaySliderValueChange() {
       estimatedCollectionAmount = repayAmount * assetRepayExchangeRate * app.state.liquidationDiscount / Math.pow(10, 12);
     } else if (assetOgSymbol === "ETH") {
         estimatedCollectionAmount = (repayAmount * (assetRepayExchangeRate) * app.state.liquidationDiscount);
+        if (repayOgSymbol === "USDC") {
+          estimatedCollectionAmount = (repayAmount * (assetRepayExchangeRate / assetBorrowExchangeRate) * app.state.liquidationDiscount) / Math.pow(10, 2);
+        }
     } else if (repayOgSymbol === "USDC") {
-      estimatedCollectionAmount = (repayAmount * (assetRepayExchangeRate / Math.pow(10, 12) / assetBorrowExchangeRate) * app.state.liquidationDiscount);
+        estimatedCollectionAmount = (repayAmount * (assetRepayExchangeRate / Math.pow(10, 12) / assetBorrowExchangeRate) * app.state.liquidationDiscount);
     } else if (assetOgSymbol === "USDC") {
       estimatedCollectionAmount = (repayAmount * (assetBorrowExchangeRate * (assetRepayExchangeRate / Math.pow(10, 12))) * app.state.liquidationDiscount);
     }
@@ -301,7 +304,7 @@ function AddressInspector (props) {
         // calculate the maximum amount that the user can liquidate
         // we can actually liquidate more than just their account liquidity since after seizing assets from their supply, the account's ratio will go under 1.5x and so forth.
         // this determines the maximum amount that we can seize in 1 liquidation
-        maxRepayAmount = app.state.borrow_balances[tokenAddressToBeRepaid] * app.state.close_factor;
+        maxRepayAmount = app.state.borrow_balances[tokenAddressToBeRepaid] * (app.state.close_factor-.005);
       } else {
         liquidationText = "Unable to repay " + app.state.asset_repay + " and collect same asset " + app.state.asset_collect + ".";
       }
