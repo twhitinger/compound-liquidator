@@ -2,7 +2,7 @@
   "name": "compound-liquidator",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://chiragkhatri.me/compound-liquidator/",
+  "homepage": "https://github.com/twhitinger/compound-liquidator",
   "dependencies": {
     "axios": "^0.18.0",
     "bignumber.js": "^8.0.1",
